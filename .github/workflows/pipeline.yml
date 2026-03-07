@@ -7,7 +7,7 @@ on:
 
 jobs:
 
-  build-and-push:
+  build-and-deploy:
 
     runs-on: ubuntu-latest
 
@@ -22,10 +22,22 @@ jobs:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-    - name: Build Docker Image
+    - name: Build Image
       run: |
         docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/devops-api:latest -f docker/Dockerfile .
 
-    - name: Push Docker Image
+    - name: Push Image
       run: |
         docker push ${{ secrets.DOCKERHUB_USERNAME }}/devops-api:latest
+
+    - name: Deploy to VM
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.VM_HOST }}
+        username: ${{ secrets.VM_USER }}
+        key: ${{ secrets.VM_SSH_KEY }}
+        script: |
+          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/devops-api:latest
+          docker stop devops-api-container || true
+          docker rm devops-api-container || true
+          docker run -d -p 8000:8000 --name devops-api-container ${{ secrets.DOCKERHUB_USERNAME }}/devops-api:latest
