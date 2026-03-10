@@ -1,139 +1,214 @@
-# VoIP Infrastructure Observability Dashboard
+# DevOps Cloud Observability Project
 
-Dashboard de observabilidade para monitoramento de infraestrutura **SIP / SBC** utilizando **Prometheus** e **Grafana**.
+Projeto prático de **DevOps e automação de infraestrutura** utilizando Infraestrutura como Código, CI/CD, containers e monitoramento.
 
-O projeto demonstra como coletar, armazenar e visualizar métricas operacionais críticas de plataformas de comunicação em tempo real, incluindo:
-
-* Alarmes de infraestrutura
-* Sessões SIP ativas
-* Registro de usuários
-* Performance de CPU
-* Pico de sessões
-* Taxa de chamadas (CPS)
-
-O objetivo é demonstrar práticas de **monitoramento e observabilidade aplicadas a ambientes de telecomunicações**.
+O objetivo deste projeto é demonstrar um **pipeline completo de automação**, desde o provisionamento da infraestrutura até o deploy automático da aplicação e monitoramento do ambiente.
 
 ---
 
-# Arquitetura da Solução
+# Arquitetura do Projeto
 
-O fluxo de dados segue o modelo clássico de observabilidade:
+Este ambiente automatiza todo o fluxo de deploy de uma aplicação containerizada.
 
-1. Dispositivos SBC e plataformas SIP expõem métricas
-2. Um **exporter** transforma essas métricas para o formato Prometheus
-3. O **Prometheus** coleta e armazena as métricas
-4. O **Grafana** consulta o Prometheus e exibe dashboards
+Componentes principais:
+
+- Provisionamento de infraestrutura com Terraform
+- Containerização da aplicação com Docker
+- Pipeline CI/CD automatizado
+- Deploy automático em VM
+- Monitoramento de infraestrutura e containers
+
+---
+
+# Fluxo de Automação
+
+O fluxo do pipeline segue o seguinte processo:
+
+1. Desenvolvedor realiza commit no repositório
+2. Pipeline CI/CD é disparado automaticamente
+3. A imagem Docker da aplicação é construída
+4. A imagem é enviada para o registry
+5. A pipeline conecta na VM via SSH
+6. A VM realiza pull da nova imagem
+7. O container é reiniciado automaticamente
+8. Prometheus coleta métricas da infraestrutura
+9. Grafana exibe dashboards de monitoramento
 
 ---
 
 # Fluxograma da Arquitetura
 
 ```mermaid
-flowchart LR
+flowchart TD
 
-A[SBC / SIP Infrastructure]
-B[Metrics Exporter]
-C[Prometheus]
-D[Grafana Dashboard]
+A[Developer Commit] --> B[GitHub Repository]
 
-A --> B
-B --> C
-C --> D
-```
+B --> C[CI/CD Pipeline]
 
----
+C --> D[Build Docker Image]
 
-# Dashboard
+D --> E[Push Image to Docker Hub]
 
-O dashboard apresenta métricas operacionais importantes para ambientes VoIP:
+E --> F[SSH Deploy to VM]
 
-| Métrica          | Descrição                    |
-| ---------------- | ---------------------------- |
-| Active Alarms    | Quantidade de alarmes ativos |
-| SIP Sessions     | Sessões SIP ativas           |
-| CPU Usage        | Uso de CPU da plataforma     |
-| Registered Users | Usuários SIP registrados     |
-| Session Peak     | Pico de sessões              |
-| Calls Per Second | Taxa de chamadas             |
+F --> G[Docker Pull Latest Image]
 
-Exemplo do dashboard:
+G --> H[Run Application Container]
 
-![Dashboard](dashboard_anonymized.png)
+H --> I[Prometheus Collect Metrics]
 
----
+I --> J[Grafana Dashboards]
 
-# Tecnologias Utilizadas
+Provisionamento da Infraestrutura
 
-* **Prometheus** → coleta de métricas
-* **Grafana** → visualização de dados
-* **PromQL** → consultas de métricas
-* **Docker** → containerização do ambiente
-* **Linux** → execução da stack de monitoramento
+A infraestrutura é criada automaticamente utilizando Terraform.
 
----
+Recursos provisionados:
 
-# Estrutura do Projeto
+Máquina virtual em cloud
 
-```
-project
+Instalação automática do Docker
+
+Configuração inicial do ambiente
+
+Executar:
+
+terraform init
+terraform plan
+terraform apply
+Pipeline CI/CD
+
+O pipeline automatizado executa as seguintes etapas:
+
+Checkout do repositório
+
+Login no Docker Hub
+
+Build da imagem Docker
+
+Push da imagem para o registry
+
+Deploy automático na VM
+
+Fluxo resumido:
+
+Commit → Build → Push Image → Deploy → Container Running
+Monitoramento
+
+O ambiente inclui monitoramento completo da infraestrutura.
+
+Métricas coletadas:
+
+CPU da VM
+
+Uso de memória
+
+Utilização de disco
+
+Containers em execução
+
+Ferramentas utilizadas:
+
+Prometheus → coleta de métricas
+Grafana → visualização e dashboards
+
+Estrutura do Projeto
+project-root
+│
+├── terraform
+│   ├── main.tf
+│   ├── variables.tf
+│   ├── provider.tf
 │
 ├── docker
-│   └── docker-compose.yml
+│   └── Dockerfile
 │
-├── grafana
-│   └── dashboard.json
+├── api
+│   └── application source
 │
-├── prometheus
-│   └── prometheus.yml
+├── monitoring
+│   ├── prometheus.yml
+│   └── grafana dashboards
 │
-└── README.md
-```
+└── .github
+    └── workflows
+        └── pipeline.yml
+Stack Tecnológica
+
+Infraestrutura
+
+Terraform
+
+Cloud VM
+
+Containers
+
+Docker
+
+Docker Hub
+
+CI/CD
+
+GitHub Actions
+
+Observabilidade
+
+Prometheus
+
+Grafana
+
+Objetivo do Projeto
+
+Este projeto foi desenvolvido para praticar e demonstrar conceitos fundamentais de DevOps:
+
+Infraestrutura como código
+
+Automação de deploy
+
+CI/CD pipelines
+
+Containerização
+
+Observabilidade
+
+Melhorias Futuras
+
+Possíveis evoluções do projeto:
+
+Deploy utilizando Kubernetes
+
+Auto Scaling da infraestrutura
+
+Monitoramento de métricas da aplicação
+
+Centralização de logs
+
+Alertas automatizados
+
 
 ---
 
-# Exemplos de Métricas Coletadas
+### Sugestão importante para seu repositório
 
-```
-sbc_alarm_active
-sbc_sessions_active
-sbc_calls_total
-sbc_registered_users
-sbc_register_messages_total
-node_cpu_seconds_total
-```
+Se quiser deixar o projeto **mais profissional no GitHub**, adicione no topo do README:
 
-Essas métricas permitem analisar:
 
-* estabilidade da plataforma
-* carga de chamadas
-* comportamento de usuários SIP
-* eventos de falha
+print do pipeline rodando
+
+print do dashboard do Grafana
+
+print do terraform apply criando a VM
+
+
+Isso transforma o README em **portfólio DevOps real**, algo que recruta dores técnicos valorizam muito.
 
 ---
 
-# Possíveis Extensões do Projeto
+Se quiser, também posso te gerar **uma versão muito mais profissional desse README (nível projeto open-source)** com:
 
-* Alertas com **Alertmanager**
-* Integração com **Slack ou Webhooks**
-* Monitoramento de **latência RTP**
-* Monitoramento de **packet loss**
-* Automação de provisionamento com **Terraform**
+- badges de status  
+- arquitetura visual  
+- seção de deploy rápido  
+- GIF do pipeline  
 
----
-
-# Objetivo do Projeto
-
-Demonstrar práticas de **observabilidade aplicada a infraestrutura de telecomunicações**, incluindo:
-
-* coleta de métricas
-* análise operacional
-* dashboards de monitoramento
-* troubleshooting de serviços SIP
-
----
-
-# Autor
-
-Eric Dias
-Network & Infrastructure Engineer
-Foco em **observabilidade, redes e automação de infraestrutura**
+que deixa o repositório **bem mais forte para LinkedIn e recrutadores DevOps**.
