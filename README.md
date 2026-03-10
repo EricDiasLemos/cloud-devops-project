@@ -38,7 +38,7 @@ O fluxo do pipeline segue o seguinte processo:
 
 # Fluxograma da Arquitetura
 
-```mermaid
+
 flowchart TD
 
 A[Developer Commit] --> B[GitHub Repository]
@@ -212,3 +212,4 @@ Se quiser, também posso te gerar **uma versão muito mais profissional desse RE
 - GIF do pipeline  
 
 que deixa o repositório **bem mais forte para LinkedIn e recrutadores DevOps**.
+
