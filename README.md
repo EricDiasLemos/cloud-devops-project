@@ -1,215 +1,175 @@
-# DevOps Cloud Observability Project
+# DevOps Cloud Observability Pipeline
 
-Projeto prático de **DevOps e automação de infraestrutura** utilizando Infraestrutura como Código, CI/CD, containers e monitoramento.
+<div align="center">
 
-O objetivo deste projeto é demonstrar um **pipeline completo de automação**, desde o provisionamento da infraestrutura até o deploy automático da aplicação e monitoramento do ambiente.
+![Badge Status Pipeline](https://img.shields.io/badge/status-em%20desenvolvimento-yellow?style=flat-square)
+![Terraform](https://img.shields.io/badge/Terraform-1.5+-623CE4?style=flat-square&logo=terraform&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-24+-2496ED?style=flat-square&logo=docker&logoColor=white)
+![GitHub Actions](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-2088FF?style=flat-square&logo=github-actions&logoColor=white)
+![Prometheus](https://img.shields.io/badge/Prometheus-2.45+-E6522C?style=flat-square&logo=prometheus&logoColor=white)
+![Grafana](https://img.shields.io/badge/Grafana-10+-F46800?style=flat-square&logo=grafana&logoColor=white)
 
----
+**Projeto prático completo de DevOps: IaC + CI/CD + Containers + Observabilidade**
 
-# Arquitetura do Projeto
+</div>
 
-Este ambiente automatiza todo o fluxo de deploy de uma aplicação containerizada.
+<br>
 
-Componentes principais:
+## Visão Geral
 
-- Provisionamento de infraestrutura com Terraform
-- Containerização da aplicação com Docker
-- Pipeline CI/CD automatizado
-- Deploy automático em VM
-- Monitoramento de infraestrutura e containers
+Demonstração prática de um **pipeline de entrega contínua** moderno, do provisionamento da infraestrutura até o monitoramento da aplicação em produção.
 
----
+### O que o projeto faz?
 
-# Fluxo de Automação
+- Cria automaticamente uma VM na cloud usando **Terraform** (IaC)
+- Containeriza uma aplicação simples com **Docker**
+- Implementa pipeline **CI/CD** com **GitHub Actions**
+- Faz deploy automático na VM via SSH + docker pull & restart
+- Monitora infraestrutura e containers com **Prometheus** + **Grafana**
 
-O fluxo do pipeline segue o seguinte processo:
+<br>
 
-1. Desenvolvedor realiza commit no repositório
-2. Pipeline CI/CD é disparado automaticamente
-3. A imagem Docker da aplicação é construída
-4. A imagem é enviada para o registry
-5. A pipeline conecta na VM via SSH
-6. A VM realiza pull da nova imagem
-7. O container é reiniciado automaticamente
-8. Prometheus coleta métricas da infraestrutura
-9. Grafana exibe dashboards de monitoramento
+## Arquitetura
 
----
+![Arquitetura do Pipeline DevOps](<img width="1459" height="660" alt="image" src="https://github.com/user-attachments/assets/4fca6b43-9579-49ad-b018-12381f94d03b" />
+![Uploading image.png…]()
+)
 
-# Fluxograma da Arquitetura
+> *Fluxo completo: commit → build → push image → deploy na VM → coleta de métricas → visualização no Grafana*
 
+<br>
 
-flowchart TD
+## Fluxo de Automação
 
-A[Developer Commit] --> B[GitHub Repository]
+1. Desenvolvedor faz commit e push no repositório  
+2. GitHub Actions dispara o pipeline automaticamente  
+3. Build da imagem Docker  
+4. Push da imagem para o Docker Hub  
+5. Conexão SSH na VM criada pelo Terraform  
+6. Pull da nova imagem na VM  
+7. Reinício do container (atualização da aplicação)  
+8. Prometheus coleta métricas (Node Exporter + container metrics)  
+9. Grafana exibe dashboards em tempo real
 
-B --> C[CI/CD Pipeline]
+<br>
 
-C --> D[Build Docker Image]
+## Tecnologias Utilizadas
 
-D --> E[Push Image to Docker Hub]
+| Camada            | Tecnologia              | Finalidade principal                     |
+|-------------------|-------------------------|------------------------------------------|
+| Infraestrutura    | Terraform               | Provisionamento como código              |
+| Cloud             | Google Cloud / AWS / ...| Hospedagem da VM                         |
+| Container         | Docker                  | Empacotamento e execução da aplicação    |
+| Registry          | Docker Hub              | Armazenamento das imagens                |
+| CI/CD             | GitHub Actions          | Automação de build, teste e deploy       |
+| Monitoramento     | Prometheus + Node Exporter | Coleta de métricas                    |
+| Visualização      | Grafana                 | Dashboards e alertas visuais             |
 
-E --> F[SSH Deploy to VM]
+<br>
 
-F --> G[Docker Pull Latest Image]
+```text
+.
+├── .github
+│   └── workflows
+│       └── deploy.yml              # Pipeline CI/CD principal (GitHub Actions)
+├── terraform
+│   ├── main.tf                     # Recursos principais (VM, firewall, etc.)
+│   ├── variables.tf                # Variáveis de entrada
+│   ├── outputs.tf                  # Saídas úteis (ex: IP da VM)
+│   ├── provider.tf                 # Configuração do provedor cloud (opcional)
+│   └── cloud-init
+│       └── user-data.yaml          # Script de inicialização da VM (instala Docker, Prometheus, etc.)
+├── docker
+│   └── Dockerfile                  # Definição da imagem da aplicação
+├── src                             # Código-fonte da aplicação (api, backend, frontend, etc.)
+│   └── ... 
+├── monitoring
+│   ├── prometheus
+│   │   └── prometheus.yml          # Configuração do Prometheus (targets, scrape configs)
+│   └── grafana
+│       └── provisioning
+│           ├── datasources         # Configuração automática do datasource Prometheus
+│           └── dashboards          # JSONs dos dashboards pré-configurados
+└── docs
+    └── images
+        └── architecture.png        # Diagrama da arquitetura do pipeline
+```
 
-G --> H[Run Application Container]
+<br>
 
-H --> I[Prometheus Collect Metrics]
+## Como Usar (Quick Start)
 
-I --> J[Grafana Dashboards]
+### 1. Provisionar a infraestrutura
 
-Provisionamento da Infraestrutura
-
-A infraestrutura é criada automaticamente utilizando Terraform.
-
-Recursos provisionados:
-
-Máquina virtual em cloud
-
-Instalação automática do Docker
-
-Configuração inicial do ambiente
-
-Executar:
-
+```bash
+cd terraform
 terraform init
 terraform plan
 terraform apply
-Pipeline CI/CD
+```
+2. Configurar Secrets no GitHub
+No repositório → Settings → Secrets and variables → Actions:
 
-O pipeline automatizado executa as seguintes etapas:
+DOCKERHUB_USERNAME
+DOCKERHUB_TOKEN
+VM_SSH_PRIVATE_KEY     (chave privada SSH – sem senha)
+VM_IP                   (IP público da VM)
+VM_USER                 (ex: ubuntu, debian, etc.)
 
-Checkout do repositório
-
-Login no Docker Hub
-
-Build da imagem Docker
-
-Push da imagem para o registry
-
-Deploy automático na VM
-
-Fluxo resumido:
-
-Commit → Build → Push Image → Deploy → Container Running
-Monitoramento
-
-O ambiente inclui monitoramento completo da infraestrutura.
-
-Métricas coletadas:
-
-CPU da VM
-
-Uso de memória
-
-Utilização de disco
-
-Containers em execução
-
-Ferramentas utilizadas:
-
-Prometheus → coleta de métricas
-Grafana → visualização e dashboards
-
-Estrutura do Projeto
-project-root
-│
-├── terraform
-│   ├── main.tf
-│   ├── variables.tf
-│   ├── provider.tf
-│
-├── docker
-│   └── Dockerfile
-│
-├── api
-│   └── application source
-│
-├── monitoring
-│   ├── prometheus.yml
-│   └── grafana dashboards
-│
-└── .github
-    └── workflows
-        └── pipeline.yml
-Stack Tecnológica
-
-Infraestrutura
-
-Terraform
-
-Cloud VM
-
-Containers
-
-Docker
-
-Docker Hub
-
-CI/CD
-
-GitHub Actions
-
-Observabilidade
-
-Prometheus
-
-Grafana
-
-Objetivo do Projeto
-
-Este projeto foi desenvolvido para praticar e demonstrar conceitos fundamentais de DevOps:
-
-Infraestrutura como código
-
-Automação de deploy
-
-CI/CD pipelines
-
-Containerização
-
-Observabilidade
-
-Melhorias Futuras
-
-Possíveis evoluções do projeto:
-
-Deploy utilizando Kubernetes
-
-Auto Scaling da infraestrutura
-
-Monitoramento de métricas da aplicação
-
-Centralização de logs
-
-Alertas automatizados
+3. Testar o deploy
+git commit --allow-empty -m "test: trigger pipeline"
+git push
 
 
----
-
-### Sugestão importante para seu repositório
-
-Se quiser deixar o projeto **mais profissional no GitHub**, adicione no topo do README:
+Observe o pipeline rodando em Actions → a aplicação será atualizada na VM automaticamente.
 
 
-print do pipeline rodando
+Demonstração (recomendado adicionar)
+Coloque capturas de tela reais na pasta docs/images/ e referencie aqui:
 
-print do dashboard do Grafana
+Pipeline rodando no GitHub Actions
+Dashboard principal no Grafana
+Output do terraform apply
+Prometheus targets mostrando a VM e containers
 
-print do terraform apply criando a VM
 
 
-Isso transforma o README em **portfólio DevOps real**, algo que recruta dores técnicos valorizam muito.
+Melhorias Futuras (roadmap)
 
----
+ Migração para Kubernetes (kind local ou cluster gerenciado)
+ GitOps com ArgoCD ou Flux
+ Blue-green / Canary deployment
+ Alertas via Alertmanager (Slack, Telegram, e-mail)
+ Instrumentação da aplicação (Prometheus client)
+ Centralização de logs (Loki + Grafana)
+ Auto Scaling da infraestrutura
+ Testes automatizados (API, segurança, carga)
 
-Se quiser, também posso te gerar **uma versão muito mais profissional desse README (nível projeto open-source)** com:
 
-- badges de status  
-- arquitetura visual  
-- seção de deploy rápido  
-- GIF do pipeline  
 
-que deixa o repositório **bem mais forte para LinkedIn e recrutadores DevOps**.
+Licença
+MIT License
+Projeto criado com o objetivo de aprendizado e portfólio DevOps.
+Se gostou, não esqueça de deixar uma ⭐!
+Feito em Contagem/MG 🚀
 
+
+### Dicas finais para deixar ainda mais profissional
+
+1. **Faça upload da imagem**  
+   Coloque a imagem que você enviou na pasta `docs/images/architecture.png` (ou o nome que preferir) e ajuste o caminho no README.
+
+2. **Adicione prints reais**  
+   Tire screenshots do:
+   - GitHub Actions rodando
+   - Grafana dashboard
+   - Prometheus targets
+   - Terminal com `terraform apply`
+
+3. **Crie o LICENSE**  
+   Adicione um arquivo `LICENSE` com o texto da MIT License.
+
+4. **Badges dinâmicos** (opcional)  
+   Se quiser badge de status do workflow:
+   ```markdown
+   <image-card alt="GitHub Workflow Status" src="https://img.shields.io/github/actions/workflow/status/SEU_USUARIO/SEU_REPO/deploy.yml?branch=main?style=flat-square" ></image-card>
